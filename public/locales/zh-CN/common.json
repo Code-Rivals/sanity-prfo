@@ -1,0 +1,14 @@
+{
+  "edit": "编辑",
+  "save": "保存更改并立即查看结果",
+  "deploy": "部署",
+  "docs": "文档",
+  "learn": "学习",
+  "examples": "示例",
+  "goToNextjs": "访问 nextjs.org →",
+  "footer": {
+    "learn": "学习",
+    "examples": "示例",
+    "goToNextjs": "访问 nextjs.org →"
+  }
+}

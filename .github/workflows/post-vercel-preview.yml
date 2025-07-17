@@ -1,0 +1,157 @@
+name: Post Vercel Preview Link to Upstream PR (Dependent Jobs - Nuanced)
+
+on:
+  pull_request:
+    types: [opened, synchronize] # Trigger on PR creation and new pushes to PR branch
+
+jobs:
+  # Job 1: Validate PR context and determine if Vercel deployment/commenting is needed
+  check_pr_context:
+    runs-on: ubuntu-latest
+    outputs:
+      # Indicates if the PR is for master and from a fork (i.e., proceed with Vercel actions)
+      should_run_vercel_actions: ${{ steps.validate.outputs.should_run_vercel_actions }}
+      # Indicates if the PR is to master but from upstream (i.e., fail the job)
+      is_upstream_to_master: ${{ steps.validate.outputs.is_upstream_to_master }}
+    steps:
+      - name: Validate PR Source and Target
+        id: validate
+        run: |
+          UPSTREAM_REPO_FULL_NAME="899ms/marketplace-v2"
+          BASE_REF="${{ github.event.pull_request.base.ref }}"
+          HEAD_REPO_FULL_NAME="${{ github.event.pull_request.head.repo.full_name }}"
+          BASE_REPO_FULL_NAME="${{ github.event.pull_request.base.repo.full_name }}"
+
+          SHOULD_RUN_VERCEL_ACTIONS="false"
+          IS_UPSTREAM_TO_MASTER="false"
+
+          echo "--- Workflow Context ---"
+          echo "Workflow's current repository (github.repository): ${{ github.repository }}" # This should be YOUR FORK's full name if workflow is in fork
+          echo "Branch/tag that triggered workflow (github.ref): ${{ github.ref }}"
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "-----------------------------"
+          echo "PR Head Repo (Source of PR): $HEAD_REPO_FULL_NAME"
+          echo "PR Base Repo (Target of PR): $BASE_REPO_FULL_NAME"
+          echo "PR Base Ref (Target Branch): $BASE_REF"
+          echo "Configured Upstream Repo: $UPSTREAM_REPO_FULL_NAME"
+          echo "-----------------------------"
+
+          if [[ "$BASE_REF" == "master" || "$BASE_REF" == "main" ]]; then
+            # PR is targeting master/main
+            if [[ "$HEAD_REPO_FULL_NAME" == "$BASE_REPO_FULL_NAME" ]]; then
+              # PR is from the upstream repo itself, targeting master/main
+              echo "PR is from the upstream repository, targeting master/main. This workflow is intended for forks."
+              IS_UPSTREAM_TO_MASTER="true"
+            else
+              # PR is from a fork, targeting master/main - this is the desired case for Vercel actions
+              echo "PR is from a fork and targeting master/main. Proceeding with Vercel actions."
+              SHOULD_RUN_VERCEL_ACTIONS="true"
+            fi
+          else
+            # PR is targeting a non-master/main branch
+            echo "PR is targeting a branch other than master/main. Skipping Vercel actions for this branch."
+            # No outputs are set to true, so subsequent jobs will be skipped by their conditions
+          fi
+
+          echo "should_run_vercel_actions=$SHOULD_RUN_VERCEL_ACTIONS" >> "$GITHUB_OUTPUT"
+          echo "is_upstream_to_master=$IS_UPSTREAM_TO_MASTER" >> "$GITHUB_OUTPUT"
+
+          # Fail the job if it's an upstream PR to master/main
+          if [[ "$IS_UPSTREAM_TO_MASTER" == "true" ]]; then
+            exit 1 # Mark job as failed
+          fi
+
+  # Job 2: Get Vercel Preview URL (depends on check_pr_context)
+  deploy_and_get_url:
+    runs-on: ubuntu-latest
+    needs: check_pr_context # This job depends on check_pr_context
+    if: needs.check_pr_context.outputs.should_run_vercel_actions == 'true' # Only run if Vercel actions are needed
+    outputs:
+      vercel_preview_url: ${{ steps.get_vercel_url.outputs.vercel_preview_url }}
+      pr_creator_login: ${{ github.event.pull_request.user.login }}
+      pr_creator_name: ${{ github.event.pull_request.user.name || github.event.pull_request.user.login }}
+      pr_number: ${{ github.event.issue.number }}
+      original_repo_owner: ${{ github.event.pull_request.base.repo.owner.login }}
+      original_repo_name: ${{ github.event.pull_request.base.repo.name }}
+
+    permissions:
+      contents: read # Required for actions/checkout
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get Vercel Preview URL
+        id: get_vercel_url
+        uses: zentered/vercel-preview-url@v1.4.0
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        with:
+          vercel_app: ${{ github.event.repository.name }}
+
+  # Job 3: Post Comment to PR (depends on deploy_and_get_url)
+  post_comment:
+    runs-on: ubuntu-latest
+    needs: deploy_and_get_url # This job depends on deploy_and_get_url
+    # Always run if deploy_and_get_url was attempted, to post success or failure message.
+    # Note: deploy_and_get_url will only run if should_run_vercel_actions was true.
+    if: always() && needs.check_pr_context.outputs.should_run_vercel_actions == 'true'
+
+    permissions:
+      pull-requests: write # Required for actions/github-script to post comments
+
+    steps:
+      - name: Determine Comment Content
+        id: determine_comment
+        run: |
+          PREVIEW_URL="${{ needs.deploy_and_get_url.outputs.vercel_preview_url }}"
+          PR_CREATOR_LOGIN="${{ needs.deploy_and_get_url.outputs.pr_creator_login }}"
+          PR_CREATOR_NAME="${{ needs.deploy_and_get_url.outputs.pr_creator_name }}"
+
+          if [[ -n "$PREVIEW_URL" ]]; then # Check if URL is not empty
+            echo "comment_type=success" >> "$GITHUB_OUTPUT"
+            echo "comment_body<<EOF" >> "$GITHUB_OUTPUT"
+            echo "👋 Hello from @${PR_CREATOR_LOGIN} (aka ${PR_CREATOR_NAME})!" >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_OUTPUT"
+            echo "Here's a preview of my changes, deployed from my fork:" >> "$GITHUB_OUTPUT"
+            echo "[View Preview Deployment](${PREVIEW_URL})" >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_OUTPUT"
+            echo "*(This deployment is managed in my personal Vercel account)*" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+          else
+            echo "comment_type=failure" >> "$GITHUB_OUTPUT"
+            echo "comment_body<<EOF" >> "$GITHUB_OUTPUT"
+            echo "⚠️ @${PR_CREATOR_LOGIN}, I couldn't find a Vercel Preview URL for this PR." >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_OUTPUT"
+            echo "This might be because:" >> "$GITHUB_OUTPUT"
+            echo "- Your Vercel deployment is still in progress." >> "$GITHUB_OUTPUT"
+            echo "- There was an issue with your Vercel project setup or deployment." >> "$GITHUB_OUTPUT"
+            echo "- The Vercel project name in your workflow (${{ github.event.repository.name }}) doesn't match your actual Vercel project." >> "$GITHUB_OUTPUT"
+            echo "- Your VERCEL_TOKEN secret might be incorrect or missing." >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_OUTPUT"
+            echo "Please check your Vercel dashboard and your fork's GitHub Actions workflow runs for more details." >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Post Comment to PR
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GIT_TOKEN }}
+          script: |
+            const core = require('@actions/core');
+
+            const prNumber = ${{ needs.deploy_and_get_url.outputs.pr_number }};
+            const originalRepoOwner = '${{ needs.deploy_and_get_url.outputs.original_repo_owner }}';
+            const originalRepoName = '${{ needs.deploy_and_get_url.outputs.original_repo_name }}';
+            const commentBody = `${{ steps.determine_comment.outputs.comment_body }}`;
+            const commentType = '${{ steps.determine_comment.outputs.comment_type }}';
+
+            github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: originalRepoOwner,
+              repo: originalRepoName,
+              body: commentBody
+            });
+
+            if (commentType === 'failure') {
+              core.setFailed('Failed to retrieve Vercel Preview URL.');
+            }
