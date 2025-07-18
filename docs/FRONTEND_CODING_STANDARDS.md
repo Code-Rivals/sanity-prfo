@@ -10,8 +10,7 @@
 - **UI Library**: Radix UI base components
 - **Styling**: Tailwind CSS v3 
 - **Icons**: Lucide React
-- **Internationalization**: next-i18next + react-i18next (English & Chinese)
-- **Package Manager**: pnpm
+- **Internationalization**: next-i18next + react-i18next (English & French)
 - **Code Standards**: @antfu/eslint-config + React
 
 ## 1. Code Quality Standards
@@ -197,7 +196,7 @@ public/                       # Static assets
 │   │   ├── auth.json
 │   │   ├── dashboard.json
 │   │   └── errors.json
-│   └── zh/
+│   └── fr/
 │       ├── common.json
 │       ├── auth.json
 │       ├── dashboard.json
@@ -790,16 +789,16 @@ export { useLocalStorage } from "./use-local-storage";
   }
 }
 
-// public/locales/zh/common.json
+// public/locales/fr/common.json
 {
   "buttons": {
-    "save": "保存",
-    "cancel": "取消",
-    "delete": "删除"
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer"
   },
   "messages": {
-    "success": "操作成功",
-    "error": "操作失败"
+    "success": "Opération réussie",
+    "error": "Échec de l'opération"
   }
 }
 ```
@@ -986,23 +985,7 @@ function DataComponent() {
 
 ## 10. Development Workflow
 
-### 10.1 Development Commands
-
-```bash
-# Dev environment (using Turbopack)
-pnpm dev
-
-# Build production version
-pnpm build
-
-# Lint code
-pnpm lint
-
-# Type checking
-pnpm type-check
-```
-
-### 10.2 Git Commit Standards
+### 10.1 Git Commit Standards
 
 ```bash
 # Commit format
@@ -1015,7 +998,7 @@ refactor(hooks): optimize useLocalStorage hook
 docs(readme): update installation guide
 ```
 
-### 10.3 Code Review Checklist
+### 10.2 Code Review Checklist
 
 - [ ] TypeScript types properly defined
 - [ ] Components follow single responsibility principle

@@ -7,20 +7,19 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ### Prerequisites
 
 - Node.js 18.x or later
-- pnpm 8.x or later
 
 ### Installation
 
 1. Install dependencies:
 
    ```bash
-   pnpm install
+   npm install
    ```
 
 2. Run the development server:
 
    ```bash
-   pnpm dev
+   npm run dev
    ```
 
 3. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -76,8 +75,8 @@ Please read our [Frontend Coding Standards](./docs/FRONTEND_CODING_STANDARDS.md)
 4. **Test Changes**
 
    ```bash
-   pnpm test    # Run unit tests
-   pnpm lint    # Check code style
+   npm run test    # Run unit tests
+   npm run lint    # Check code style
    ```
 
 5. **Submit PR**

@@ -1,0 +1,14 @@
+{
+  "edit": "Éditer",
+  "save": "Enregistrer les modifications et voir le résultat instantanément",
+  "deploy": "Déployer",
+  "docs": "Documentation",
+  "learn": "Apprendre",
+  "examples": "Exemples",
+  "goToNextjs": "Aller sur nextjs.org →",
+  "footer": {
+    "learn": "Apprendre",
+    "examples": "Exemples",
+    "goToNextjs": "Aller sur nextjs.org →"
+  }
+}
