@@ -7,6 +7,7 @@
 import { visionTool } from '@sanity/vision'
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
+import { presentationTool } from 'sanity/presentation'
 import { muxInput } from 'sanity-plugin-mux-input'
 import { imageHotspotArrayPlugin } from "sanity-plugin-hotspot-array";
 import { apiVersion, dataset, projectId } from './sanity/env'
@@ -21,6 +22,14 @@ export default defineConfig({
   schema,
   plugins: [
     structureTool({ structure }),
+    presentationTool({
+      previewUrl: {
+        origin: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
+        previewMode: {
+          enable: '/api/draft',
+        },
+      },
+    }),
     visionTool({ defaultApiVersion: apiVersion }),
     muxInput({
       mp4_support: 'standard',

@@ -1,5 +1,5 @@
 export const apiVersion =
-  process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2025-07-17'
+  process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01'
 
 export const dataset = assertValue(
   process.env.NEXT_PUBLIC_SANITY_DATASET,
@@ -18,3 +18,7 @@ function assertValue<T>(v: T | undefined, errorMessage: string): T {
 
   return v
 }
+
+// Additional environment variables for development
+export const previewSecret = process.env.NEXT_PUBLIC_SANITY_PREVIEW_SECRET || 'preview-secret'
+export const token = process.env.NEXT_PUBLIC_SANITY_API_READ_TOKEN

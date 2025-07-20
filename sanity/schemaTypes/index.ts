@@ -1,3 +1,4 @@
+
 import { type SchemaTypeDefinition } from 'sanity'
 
 import { blockContentType } from './blockContentType'
@@ -17,6 +18,17 @@ import {
   informationsPageType
 } from './pageTypes'
 import {
+  // New modern content blocks
+  sectionTextType,
+  sectionImageType,
+  sectionGalleryType,
+  sectionHeroType,
+  sectionCardsType,
+  sectionZonesType,
+  sectionFaqType,
+  sectionPricesType,
+  
+  // Legacy blocks for backward compatibility
   textBlockType,
   imageBlockType,
   galleryBlockType,
@@ -49,7 +61,17 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     ticketsPageType,
     informationsPageType,
 
-    // Content block types
+    // Modern content block types
+    sectionTextType,
+    sectionImageType,
+    sectionGalleryType,
+    sectionHeroType,
+    sectionCardsType,
+    sectionZonesType,
+    sectionFaqType,
+    sectionPricesType,
+
+    // Legacy content block types
     textBlockType,
     imageBlockType,
     galleryBlockType,
