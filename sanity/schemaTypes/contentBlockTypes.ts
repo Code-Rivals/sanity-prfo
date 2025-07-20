@@ -122,36 +122,60 @@ export const galleryBlockType = defineType({
 
 // Video embed block
 export const videoBlockType = defineType({
-    name: 'videoBlock',
-    title: 'Video Block',
+    name: 'video',
+    title: 'Video',
     type: 'object',
     fields: [
-        defineField({
+        {
+            name: 'asset',
+            title: 'Video Asset',
+            type: 'mux.video',
+            description: 'Upload or select a video file'
+        },
+        {
             name: 'title',
             title: 'Title',
-            type: 'string'
-        }),
-        defineField({
-            name: 'url',
-            title: 'Video URL',
-            type: 'url',
-            description: 'YouTube or Vimeo URL'
-        }),
-        defineField({
+            type: 'string',
+            validation: (Rule) => Rule.required()
+        },
+        {
             name: 'description',
             title: 'Description',
-            type: 'text'
-        })
+            type: 'text',
+            rows: 3
+        },
+        {
+            name: 'thumbnail',
+            title: 'Custom Thumbnail',
+            type: 'image',
+            description: 'Optional: Override auto-generated thumbnail',
+            options: {
+                hotspot: true
+            }
+        },
+        {
+            name: 'autoplay',
+            title: 'Autoplay',
+            type: 'boolean',
+            initialValue: false
+        },
+        {
+            name: 'loop',
+            title: 'Loop Video',
+            type: 'boolean',
+            initialValue: false
+        },
+        {
+            name: 'muted',
+            title: 'Muted by Default',
+            type: 'boolean',
+            initialValue: true
+        }
     ],
     preview: {
         select: {
-            title: 'title'
-        },
-        prepare({ title }) {
-            return {
-                title: title || 'Video Block',
-                subtitle: 'Video'
-            }
+            title: 'title',
+            media: 'asset'
         }
     }
 })

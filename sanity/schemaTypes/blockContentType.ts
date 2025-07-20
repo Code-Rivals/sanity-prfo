@@ -95,7 +95,7 @@ export const blockContentType = defineType({
       name: 'videoBlockReference',
       type: 'reference',
       title: 'Video Block',
-      to: [{ type: 'videoBlock' }]
+      to: [{ type: 'video' }]
     }),
     defineArrayMember({
       name: 'ctaBlockReference',

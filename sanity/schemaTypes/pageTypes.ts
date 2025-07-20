@@ -1,5 +1,5 @@
 import { defineType, defineField, defineArrayMember } from 'sanity'
-import { SlugIcon } from '@sanity/icons'
+import { AddIcon } from '@sanity/icons'
 
 // Base page schema that all other page types extend
 export const genericPageType = defineType({
@@ -17,7 +17,7 @@ export const genericPageType = defineType({
             name: 'slug',
             title: 'Slug',
             type: 'slug',
-            icon: SlugIcon,
+            icon: AddIcon,
             options: {
                 source: 'title',
                 maxLength: 96,
@@ -48,7 +48,7 @@ export const faqPageType = defineType({
             name: 'slug',
             title: 'Slug',
             type: 'slug',
-            icon: SlugIcon,
+            icon: AddIcon,
             options: {
                 source: 'title',
                 maxLength: 96,
@@ -93,7 +93,7 @@ export const newsPageType = defineType({
             name: 'slug',
             title: 'Slug',
             type: 'slug',
-            icon: SlugIcon,
+            icon: AddIcon,
             options: {
                 source: 'title',
                 maxLength: 96,
@@ -159,7 +159,7 @@ export const eventPageType = defineType({
             name: 'slug',
             title: 'Slug',
             type: 'slug',
-            icon: SlugIcon,
+            icon: AddIcon,
             options: {
                 source: 'title',
                 maxLength: 96,
@@ -225,7 +225,18 @@ export const eventPageType = defineType({
             title: 'Content',
             type: 'array',
             of: [{ type: 'blockContent' }]
-        })
+        }),
+        defineField({
+            name: 'heroVideo',
+            title: 'Hero Video',
+            type: 'video'
+        }),
+        defineField({
+            name: 'contentVideos',
+            title: 'Content Videos',
+            type: 'array',
+            of: [{ type: 'video' }]
+        }),
     ]
 })
 
@@ -244,7 +255,7 @@ export const zonePageType = defineType({
             name: 'slug',
             title: 'Slug',
             type: 'slug',
-            icon: SlugIcon,
+            icon: AddIcon,
             options: {
                 source: 'title',
                 maxLength: 96,
@@ -275,7 +286,7 @@ export const zonesListingPageType = defineType({
             name: 'slug',
             title: 'Slug',
             type: 'slug',
-            icon: SlugIcon,
+            icon: AddIcon,
             options: {
                 source: 'title',
                 maxLength: 96,
@@ -336,7 +347,7 @@ export const mapPageType = defineType({
             name: 'slug',
             title: 'Slug',
             type: 'slug',
-            icon: SlugIcon,
+            icon: AddIcon,
             options: {
                 source: 'title',
                 maxLength: 96,
@@ -379,7 +390,7 @@ export const pricesPageType = defineType({
             name: 'slug',
             title: 'Slug',
             type: 'slug',
-            icon: SlugIcon,
+            icon: AddIcon,
             options: {
                 source: 'title',
                 maxLength: 96,
@@ -420,7 +431,7 @@ export const ticketsPageType = defineType({
             name: 'slug',
             title: 'Slug',
             type: 'slug',
-            icon: SlugIcon,
+            icon: AddIcon,
             options: {
                 source: 'title',
                 maxLength: 96,
@@ -477,7 +488,7 @@ export const informationsPageType = defineType({
             name: 'slug',
             title: 'Slug',
             type: 'slug',
-            icon: SlugIcon,
+            icon: AddIcon,
             options: {
                 source: 'title',
                 maxLength: 96,
