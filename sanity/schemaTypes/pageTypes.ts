@@ -2,6 +2,80 @@
 import { defineType, defineField, defineArrayMember } from 'sanity'
 import { DocumentIcon, CommentIcon, DocumentTextIcon, CalendarIcon, ComponentIcon, ImageIcon, CreditCardIcon } from '@sanity/icons'
 
+
+
+// Define a reusable meta data section as a document type
+export const metaDataSectionType = defineType({
+  name: 'metaDataSection',
+  title: 'Meta Data Section',
+  type: 'document',
+  fields: [
+    defineField({
+      name: 'metaTitle',
+      title: 'Meta Title',
+      type: 'string',
+      description: 'SEO meta title for this page'
+    }),
+    defineField({
+      name: 'metaDescription',
+      title: 'Meta Description',
+      type: 'text',
+      description: 'SEO meta description for this page'
+    }),
+    defineField({
+      name: 'meta',
+      title: 'Meta Data',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'keywords',
+          title: 'Keywords',
+          type: 'array',
+          of: [{ type: 'string' }],
+          description: 'SEO keywords for this page'
+        }),
+        defineField({
+          name: 'robots',
+          title: 'Robots',
+          type: 'string',
+          description: 'Robots meta tag value (e.g., index, follow)'
+        })
+      ]
+    })
+  ]
+});
+
+// Reusable slug with language field
+const slugWithLangField = defineField({
+  name: 'slug',
+  title: 'Slug',
+  type: 'object',
+  fields: [
+    defineField({
+      name: 'lang',
+      title: 'Language',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'English', value: 'en' },
+          { title: 'French', value: 'fr' }
+        ]
+      },
+      validation: Rule => Rule.required()
+    }),
+    defineField({
+      name: 'value',
+      title: 'Slug Value',
+      type: 'slug',
+      options: {
+        source: 'title',
+        maxLength: 96
+      },
+      validation: Rule => Rule.required()
+    })
+  ]
+});
+
 // Generic Page Type
 export const genericPageType = defineType({
   name: 'genericPage',
@@ -15,15 +89,12 @@ export const genericPageType = defineType({
       type: 'string',
       validation: Rule => Rule.required()
     }),
+    ...[slugWithLangField],
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        source: 'title',
-        maxLength: 96
-      },
-      validation: Rule => Rule.required()
+      name: 'metaData',
+      title: 'Meta Data',
+      type: 'reference',
+      to: [{ type: 'metaDataSection' }]
     }),
     defineField({
       name: 'content',
@@ -55,6 +126,74 @@ export const genericPageType = defineType({
   }
 })
 
+
+export const metDataPageType = defineType({
+  name: 'metDataPage',
+  title: 'Meta Data Page',
+  type: 'document',
+  icon: DocumentIcon,
+  fields: [
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      validation: Rule => Rule.required()
+    }),
+    ...[slugWithLangField],
+    defineField({
+      name: 'metaData',
+      title: 'Meta Data',
+      type: 'reference',
+      to: [{ type: 'metaDataSection' }]
+    }),
+    defineField({
+      name: 'content',
+      title: 'Content',
+      type: 'array',
+      of: [
+        { type: 'sectionText' },
+        { type: 'sectionZones' }
+      ]
+    }),
+    defineField({
+      name: 'zones',
+      title: 'Featured Zones',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'zone',
+              title: 'Zone',
+              type: 'reference',
+              to: [{ type: 'zonePage' }]
+            }),
+            defineField({
+              name: 'link',
+              title: 'Custom Link',
+              type: 'url'
+            }),
+            defineField({
+              name: 'layout',
+              title: 'Layout Variant',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'Default', value: 'default' },
+                  { title: 'Large', value: 'large' },
+                  { title: 'Small', value: 'small' }
+                ]
+              },
+              initialValue: 'default'
+            })
+          ]
+        })
+      ]
+    })
+  ]
+})
+
 // FAQ Page Type
 export const faqPageType = defineType({
   name: 'faqPage',
@@ -68,15 +207,12 @@ export const faqPageType = defineType({
       type: 'string',
       validation: Rule => Rule.required()
     }),
+    ...[slugWithLangField],
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        source: 'title',
-        maxLength: 96
-      },
-      validation: Rule => Rule.required()
+      name: 'metaData',
+      title: 'Meta Data',
+      type: 'reference',
+      to: [{ type: 'metaDataSection' }]
     }),
     defineField({
       name: 'faqs',
@@ -117,15 +253,12 @@ export const newsPageType = defineType({
       type: 'string',
       validation: Rule => Rule.required()
     }),
+    ...[slugWithLangField],
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        source: 'title',
-        maxLength: 96
-      },
-      validation: Rule => Rule.required()
+      name: 'metaData',
+      title: 'Meta Data',
+      type: 'reference',
+      to: [{ type: 'metaDataSection' }]
     }),
     defineField({
       name: 'image',
@@ -205,15 +338,12 @@ export const eventPageType = defineType({
       type: 'string',
       validation: Rule => Rule.required()
     }),
+    ...[slugWithLangField],
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        source: 'title',
-        maxLength: 96
-      },
-      validation: Rule => Rule.required()
+      name: 'metaData',
+      title: 'Meta Data',
+      type: 'reference',
+      to: [{ type: 'metaDataSection' }]
     }),
     defineField({
       name: 'image',
@@ -322,15 +452,12 @@ export const zonePageType = defineType({
       type: 'string',
       validation: Rule => Rule.required()
     }),
+    ...[slugWithLangField],
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        source: 'title',
-        maxLength: 96
-      },
-      validation: Rule => Rule.required()
+      name: 'metaData',
+      title: 'Meta Data',
+      type: 'reference',
+      to: [{ type: 'metaDataSection' }]
     }),
     defineField({
       name: 'description',
@@ -379,15 +506,12 @@ export const zonesListingPageType = defineType({
       type: 'string',
       validation: Rule => Rule.required()
     }),
+    ...[slugWithLangField],
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        source: 'title',
-        maxLength: 96
-      },
-      validation: Rule => Rule.required()
+      name: 'metaData',
+      title: 'Meta Data',
+      type: 'reference',
+      to: [{ type: 'metaDataSection' }]
     }),
     defineField({
       name: 'content',
@@ -450,15 +574,12 @@ export const mapPageType = defineType({
       type: 'string',
       validation: Rule => Rule.required()
     }),
+    ...[slugWithLangField],
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        source: 'title',
-        maxLength: 96
-      },
-      validation: Rule => Rule.required()
+      name: 'metaData',
+      title: 'Meta Data',
+      type: 'reference',
+      to: [{ type: 'metaDataSection' }]
     }),
     defineField({
       name: 'image',
@@ -496,15 +617,12 @@ export const pricesPageType = defineType({
       type: 'string',
       validation: Rule => Rule.required()
     }),
+    ...[slugWithLangField],
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        source: 'title',
-        maxLength: 96
-      },
-      validation: Rule => Rule.required()
+      name: 'metaData',
+      title: 'Meta Data',
+      type: 'reference',
+      to: [{ type: 'metaDataSection' }]
     }),
     defineField({
       name: 'subtitle',
@@ -541,15 +659,12 @@ export const ticketsPageType = defineType({
       type: 'string',
       validation: Rule => Rule.required()
     }),
+    ...[slugWithLangField],
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        source: 'title',
-        maxLength: 96
-      },
-      validation: Rule => Rule.required()
+      name: 'metaData',
+      title: 'Meta Data',
+      type: 'reference',
+      to: [{ type: 'metaDataSection' }]
     }),
     defineField({
       name: 'category',
@@ -619,6 +734,8 @@ export const ticketsPageType = defineType({
   ]
 })
 
+
+
 // Informations Page Type
 export const informationsPageType = defineType({
   name: 'informationsPage',
@@ -632,15 +749,12 @@ export const informationsPageType = defineType({
       type: 'string',
       validation: Rule => Rule.required()
     }),
+    ...[slugWithLangField],
     defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      options: {
-        source: 'title',
-        maxLength: 96
-      },
-      validation: Rule => Rule.required()
+      name: 'metaData',
+      title: 'Meta Data',
+      type: 'reference',
+      to: [{ type: 'metaDataSection' }]
     }),
     defineField({
       name: 'schedule',
@@ -701,3 +815,49 @@ export const informationsPageType = defineType({
     })
   ]
 })
+
+// Locales Page Type for general keys
+export const localesPageType = defineType({
+  name: 'localesPage',
+  title: 'Locales Page',
+  type: 'document',
+  icon: DocumentIcon,
+  fields: [
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      validation: Rule => Rule.required()
+    }),
+    defineField({
+      name: 'translations',
+      title: 'Translations',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'key',
+              title: 'Key',
+              type: 'string',
+              validation: Rule => Rule.required()
+            }),
+            defineField({
+              name: 'en',
+              title: 'English',
+              type: 'string',
+              validation: Rule => Rule.required()
+            }),
+            defineField({
+              name: 'fr',
+              title: 'French',
+              type: 'string',
+              validation: Rule => Rule.required()
+            })
+          ]
+        })
+      ]
+    })
+  ]
+});

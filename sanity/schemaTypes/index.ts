@@ -15,7 +15,9 @@ import {
   mapPageType,
   pricesPageType,
   ticketsPageType,
-  informationsPageType
+  informationsPageType,
+  metaDataSectionType,
+  localesPageType
 } from './pageTypes'
 import {
   // New modern content blocks
@@ -27,7 +29,7 @@ import {
   sectionZonesType,
   sectionFaqType,
   sectionPricesType,
-  
+
   // Legacy blocks for backward compatibility
   textBlockType,
   imageBlockType,
@@ -81,6 +83,11 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     testimonialBlockType,
     accordionBlockType,
     contactFormBlockType,
-    mapBlockType
+    mapBlockType,
+
+    // Meta Data Section
+    metaDataSectionType,
+    localesPageType
   ],
+
 }

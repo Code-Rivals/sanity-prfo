@@ -12,6 +12,7 @@
   "dependencies": {
     "@mux/mux-node": "^12.2.0",
     "@mux/mux-player-react": "^3.5.1",
+    "@portabletext/react": "^3.2.1",
     "@remixicon/react": "^4.6.0",
     "@sanity/icons": "^3.7.4",
     "@sanity/image-url": "^1.1.0",
